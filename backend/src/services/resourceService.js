@@ -54,7 +54,7 @@ function registerProduct(keySeed, product) {
 async function giveProduct(keySeed, transactionId) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
   const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
-  return new Promise(async (resolve, reject) => {
+  return new Promise( async (resolve, reject) => {
     // Construct metadata.
     const metaData = {
       action: 'Give to Commons',
