@@ -6,12 +6,13 @@ const BIGCHAINDB_URL = process.env.BIGCHAINDB_URL || config.bigchaindburl;
 
 const connection = new driver.Connection(BIGCHAINDB_URL);
 
+// Register a new product. Status will be unavailable
 function registerProduct(keySeed, product) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
   return new Promise((resolve, reject) => {
     // Create asset object.
     const assetData = {
-      type: 'buffalonetworkAssets',
+      type: 'buffalonetworkAssetsPrototype',
       item: product,
     };
 
@@ -168,7 +169,7 @@ async function confirmProduct(keySeed, newOwnerSeed, transactionId) {
 
 async function getAllAssets() {
     const assets = await new Promise((resolve, reject) => {
-      connection.searchAssets('buffalonetworkAssets').then((response) => {
+      connection.searchAssets('buffalonetworkAssetsPrototype').then((response) => {
         resolve(response);
       }).catch((error) => {
       reject(error);

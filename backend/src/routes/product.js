@@ -53,15 +53,20 @@ module.exports = [
 
   {
     method: 'GET',
-    path: '/api/products/{status}/{seed}',
+    path: '/api/products/{seed}',
     config: { auth: false, cors: true },
     async handler(req, h) {
       const status = req.params.status;
       const seed = req.params.seed;
 
+      let userAssets = {};
+
       const assets = await resourceService.getProductsFromCustomer(seed);
-      const availableAssets = await resourceService.getAssetsByStatus(assets, status);
-      return availableAssets;
+      userAssets.unavailable = await resourceService.getAssetsByStatus(assets, 'unavailable');
+      userAssets.available = await resourceService.getAssetsByStatus(assets, 'available');
+      userAssets.pending = await resourceService.getAssetsByStatus(assets, 'pending');
+
+      return userAssets;
     },
   },
 
