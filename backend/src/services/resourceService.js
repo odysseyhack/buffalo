@@ -58,6 +58,7 @@ async function giveProduct(keySeed, transactionId) {
     // Construct metadata.
     const metaData = {
       action: 'available',
+      seed: keySeed,
       date: new Date().toISOString(),
     };
 
@@ -90,17 +91,20 @@ async function giveProduct(keySeed, transactionId) {
   });
 }
 
-async function reserveProduct(keySeed, transactionId) {
-  const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
+async function reserveProduct(transactionId) {
   return new Promise(async (resolve, reject) => {
     // Construct metadata.
-    const metaData = {
-      action: 'pending',
-      date: new Date().toISOString(),
-    };
 
     const initialTransactions = await connection.getTransaction(transactionId);
     console.log('tester-->', initialTransactions);
+    const currentIdentity = keyGenerationUtils.generateKeypair(initialTransactions.metadata.seed);
+
+    const metaData = {
+      action: 'pending',
+      seed: initialTransactions.metadata.seed,
+      date: new Date().toISOString(),
+    };
+
 
     // Construct the new transaction
     const transferTransaction = driver.Transaction.makeTransferTransaction(
@@ -128,8 +132,8 @@ async function reserveProduct(keySeed, transactionId) {
   });
 }
 
-async function confirmProduct(keySeed, newOwnerSeed, transactionId) {
-  const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
+async function confirmProduct(newOwnerSeed, transactionId) {
+  // const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
   const newIdentity = keyGenerationUtils.generateKeypair(newOwnerSeed);
   return new Promise(async (resolve, reject) => {
     // Construct metadata.
@@ -140,6 +144,8 @@ async function confirmProduct(keySeed, newOwnerSeed, transactionId) {
 
     const initialTransactions = await connection.getTransaction(transactionId);
     console.log('tester-->', initialTransactions);
+    const currentIdentity = keyGenerationUtils.generateKeypair(initialTransactions.metadata.seed);
+
 
     // Construct the new transaction
     const transferTransaction = driver.Transaction.makeTransferTransaction(

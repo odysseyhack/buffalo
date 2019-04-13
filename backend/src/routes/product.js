@@ -34,7 +34,7 @@ module.exports = [
     path: '/api/product/pending',
     config: { auth: false, cors: true },
     async handler(req, h) {
-      const takeTransaction = await resourceService.reserveProduct(req.payload.owner, req.payload.transactionId);
+      const takeTransaction = await resourceService.reserveProduct(req.payload.transactionId);
       return takeTransaction.id
     }
   },
@@ -45,10 +45,11 @@ module.exports = [
     path: '/api/product/confirm',
     config: { auth: false, cors: true },
     async handler(req, h) {
-      const takeTransaction = await resourceService.confirmProduct(req.payload.oldOwner, req.payload.newOwner, req.payload.transactionId);
+      const takeTransaction = await resourceService.confirmProduct(req.payload.newOwner, req.payload.transactionId);
       return takeTransaction.id
     }
   },
+
 // All routes for user products
 
   {
