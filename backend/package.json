@@ -26,7 +26,8 @@
   "dependencies": {
     "bigchaindb-driver": "^4.1.0",
     "bip39": "^3.0.1",
-    "hapi": "^18.1.0"
+    "hapi": "^18.1.0",
+    "base-x": "3.0.4"
   },
   "devDependencies": {
     "nodemon": "^1.18.11"

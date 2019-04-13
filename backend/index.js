@@ -1,5 +1,7 @@
 'use strict';
 
+const routes = require('./src/routes')
+
 const Hapi = require('hapi');
 
 const init = async () => {
@@ -18,8 +20,10 @@ const init = async () => {
         }
     });
 
+    server.route(routes);
+
     await server.start();
-    console.log('Server running on %ss', server.info.uri);
+    console.log('Server running on %s', server.info.uri);
 };
 
 process.on('unhandledRejection', (err) => {
