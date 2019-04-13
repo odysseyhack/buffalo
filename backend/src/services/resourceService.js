@@ -11,13 +11,13 @@ function registerProduct(keySeed, product) {
   return new Promise((resolve, reject) => {
     // Create asset object.
     const assetData = {
-      type: 'TestProduct-2019',
+      type: 'buffalonetworkAssets',
       item: product,
     };
 
     // Create metadata object.
     const metaData = {
-      action: 'register product',
+      action: 'unavailable',
       date: new Date().toISOString(),
     };
 
@@ -53,50 +53,10 @@ function registerProduct(keySeed, product) {
 
 async function giveProduct(keySeed, transactionId) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
-  const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
   return new Promise(async (resolve, reject) => {
     // Construct metadata.
     const metaData = {
-      action: 'Give to Commons',
-      date: new Date().toISOString(),
-    };
-
-    const initialTransactions = await connection.getTransaction(transactionId);
-    console.log('tester-->', initialTransactions);
-
-    // Construct the new transaction
-    const transferTransaction = driver.Transaction.makeTransferTransaction(
-      // The previous transaction to be chained upon.
-      [{ tx: initialTransactions, output_index: 0 }],
-
-      // The (output) condition to be fullfilled in the next transaction.
-      [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(productCommonsIdentity.publicKey))],
-
-      // Metadata
-      metaData,
-    );
-
-    // Sign the new transaction.
-    const signedTransaction = driver.Transaction.signTransaction(transferTransaction, currentIdentity.privateKey);
-
-    // Post the transaction.
-    connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
-      // Return the posted transaction to the callback funcion.
-      resolve(successfullyPostedTransaction);
-    }).catch((error) => {
-      // Throw error
-      reject(error);
-    });
-  });
-}
-
-function takeProduct(keySeed, transactionId) {
-  const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
-  const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
-  return new Promise(async (resolve, reject) => {
-    // Construct metadata.
-    const metaData = {
-      action: 'Take from Commons',
+      action: 'available',
       date: new Date().toISOString(),
     };
 
@@ -116,7 +76,7 @@ function takeProduct(keySeed, transactionId) {
     );
 
     // Sign the new transaction.
-    const signedTransaction = driver.Transaction.signTransaction(transferTransaction, productCommonsIdentity.privateKey);
+    const signedTransaction = driver.Transaction.signTransaction(transferTransaction, currentIdentity.privateKey);
 
     // Post the transaction.
     connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
@@ -129,34 +89,119 @@ function takeProduct(keySeed, transactionId) {
   });
 }
 
-async function getProductsFromCommons() {
-  const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
-  const transactionIds = await new Promise((resolve, reject) => {
-    // Get a list of ids of unspent transactions from a public key.
-    connection.listOutputs(productCommonsIdentity.publicKey, false).then((response) => {
-      resolve(response);
-    }).catch((err) => {
-      reject(err);
+async function reserveProduct(keySeed, transactionId) {
+  const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
+  return new Promise(async (resolve, reject) => {
+    // Construct metadata.
+    const metaData = {
+      action: 'pending',
+      date: new Date().toISOString(),
+    };
+
+    const initialTransactions = await connection.getTransaction(transactionId);
+    console.log('tester-->', initialTransactions);
+
+    // Construct the new transaction
+    const transferTransaction = driver.Transaction.makeTransferTransaction(
+      // The previous transaction to be chained upon.
+      [{ tx: initialTransactions, output_index: 0 }],
+
+      // The (output) condition to be fullfilled in the next transaction.
+      [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(currentIdentity.publicKey))],
+
+      // Metadata
+      metaData,
+    );
+
+    // Sign the new transaction.
+    const signedTransaction = driver.Transaction.signTransaction(transferTransaction, currentIdentity.privateKey);
+
+    // Post the transaction.
+    connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
+      // Return the posted transaction to the callback funcion.
+      resolve(successfullyPostedTransaction);
+    }).catch((error) => {
+      // Throw error
+      reject(error);
     });
   });
+}
 
-  const assets = [];
+async function confirmProduct(keySeed, newOwnerSeed, transactionId) {
+  const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
+  const newIdentity = keyGenerationUtils.generateKeypair(newOwnerSeed);
+  return new Promise(async (resolve, reject) => {
+    // Construct metadata.
+    const metaData = {
+      action: 'unavailable',
+      date: new Date().toISOString(),
+    };
 
-  for (const transaction of transactionIds) {
-    await connection.getTransaction(transaction.transaction_id).then(async (response) => {
-      if (response.operation === 'CREATE') {
-        const assetTransactions = await connection.listTransactions(response.id, 'CREATE');
-        return { id: assetTransactions[0].id, data: assetTransactions[0].asset.data };
-      }
-      const assetTransactions = await connection.listTransactions(response.asset.id, 'CREATE');
-      return { id: assetTransactions[0].id, data: assetTransactions[0].asset.data };
-    }).then((response) => {
-      assets.push(response);
-    }).catch((err) => {
-      console.log(transaction.transaction_id);
+    const initialTransactions = await connection.getTransaction(transactionId);
+    console.log('tester-->', initialTransactions);
+
+    // Construct the new transaction
+    const transferTransaction = driver.Transaction.makeTransferTransaction(
+      // The previous transaction to be chained upon.
+      [{ tx: initialTransactions, output_index: 0 }],
+
+      // The (output) condition to be fullfilled in the next transaction.
+      [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(newIdentity.publicKey))],
+
+      // Metadata
+      metaData,
+    );
+
+    // Sign the new transaction.
+    const signedTransaction = driver.Transaction.signTransaction(transferTransaction, currentIdentity.privateKey);
+
+    // Post the transaction.
+    connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
+      // Return the posted transaction to the callback funcion.
+      resolve(successfullyPostedTransaction);
+    }).catch((error) => {
+      // Throw error
+      reject(error);
     });
-  }
+  });
+}
+
+async function getAllAssets() {
+    const assets = await new Promise((resolve, reject) => {
+      connection.searchAssets('buffalonetworkAssets').then((response) => {
+        resolve(response);
+      }).catch((error) => {
+      reject(error);
+    });
+  });
   return assets;
+}
+
+async function getAssetDetails(assetId) {
+  return new Promise((resolve, reject) => {
+    connection.listTransactions(assetId).then((response) => {
+      resolve(response);
+    }).catch((error) => {
+    reject(error);
+    });
+  });
+}
+
+async function getAssetsByStatus(assets, status) {
+  let availableAssets = []
+  let promiseArray = []
+  assets.forEach(async function(asset) {
+    promiseArray.push(getAssetDetails(asset.id));
+  });
+  await Promise.all(promiseArray).then(function(assetDetails) {
+    assetDetails.forEach(function(details) {
+      const lastIndex = details[details.length-1];
+      if (lastIndex.metadata.action === status) {
+        availableAssets.push(lastIndex)
+      }
+    });
+  });
+  return availableAssets;
 }
 
 async function getProductsFromCustomer(keySeed) {
@@ -190,5 +235,5 @@ async function getProductsFromCustomer(keySeed) {
 }
 
 module.exports = {
-  registerProduct, giveProduct, takeProduct, getProductsFromCommons, getProductsFromCustomer,
+  registerProduct, giveProduct, reserveProduct, confirmProduct, getAllAssets, getAssetDetails, getProductsFromCustomer, getAssetsByStatus
 };
