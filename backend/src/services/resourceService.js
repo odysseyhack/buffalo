@@ -54,7 +54,7 @@ function registerProduct(keySeed, product) {
 async function giveProduct(keySeed, transactionId) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
   const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
-  return new Promise( async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     // Construct metadata.
     const metaData = {
       action: 'Give to Commons',
@@ -66,14 +66,14 @@ async function giveProduct(keySeed, transactionId) {
 
     // Construct the new transaction
     const transferTransaction = driver.Transaction.makeTransferTransaction(
-        // The previous transaction to be chained upon.
-        [{tx: initialTransactions, output_index: 0}],
+      // The previous transaction to be chained upon.
+      [{ tx: initialTransactions, output_index: 0 }],
 
-        // The (output) condition to be fullfilled in the next transaction.
-        [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(productCommonsIdentity.publicKey))],
+      // The (output) condition to be fullfilled in the next transaction.
+      [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(productCommonsIdentity.publicKey))],
 
-        // Metadata
-        metaData,
+      // Metadata
+      metaData,
     );
 
     // Sign the new transaction.
@@ -105,14 +105,14 @@ function takeProduct(keySeed, transactionId) {
 
     // Construct the new transaction
     const transferTransaction = driver.Transaction.makeTransferTransaction(
-        // The previous transaction to be chained upon.
-        [{tx: initialTransactions, output_index: 0}],
+      // The previous transaction to be chained upon.
+      [{ tx: initialTransactions, output_index: 0 }],
 
-        // The (output) condition to be fullfilled in the next transaction.
-        [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(currentIdentity.publicKey))],
+      // The (output) condition to be fullfilled in the next transaction.
+      [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(currentIdentity.publicKey))],
 
-        // Metadata
-        metaData,
+      // Metadata
+      metaData,
     );
 
     // Sign the new transaction.
@@ -140,7 +140,7 @@ async function getProductsFromCommons() {
     });
   });
 
-  let assets = [];
+  const assets = [];
 
   for (const transaction of transactionIds) {
     await connection.getTransaction(transaction.transaction_id).then(async (response) => {
@@ -157,7 +157,6 @@ async function getProductsFromCommons() {
     });
   }
   return assets;
-
 }
 
 async function getProductsFromCustomer(keySeed) {
@@ -171,7 +170,7 @@ async function getProductsFromCustomer(keySeed) {
     });
   });
 
-  let assets = [];
+  const assets = [];
 
   for (const transaction of transactionIds) {
     await connection.getTransaction(transaction.transaction_id).then(async (response) => {
@@ -188,7 +187,8 @@ async function getProductsFromCustomer(keySeed) {
     });
   }
   return assets;
-
 }
 
-module.exports = { registerProduct, giveProduct, takeProduct, getProductsFromCommons, getProductsFromCustomer };
+module.exports = {
+  registerProduct, giveProduct, takeProduct, getProductsFromCommons, getProductsFromCustomer,
+};
