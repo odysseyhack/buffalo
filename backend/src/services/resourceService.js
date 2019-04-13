@@ -51,21 +51,23 @@ function registerProduct(keySeed, product) {
   });
 }
 
-function giveProduct(keySeed, transactionId) {
+async function giveProduct(keySeed, transactionId) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
   const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     // Construct metadata.
     const metaData = {
       action: 'Give to Commons',
       date: new Date().toISOString(),
     };
 
+    const initialTransactions = await connection.getTransaction(transactionId);
+    console.log('tester-->', initialTransactions);
+
     // Construct the new transaction
     const transferTransaction = driver.Transaction.makeTransferTransaction(
-
         // The previous transaction to be chained upon.
-        [{ tx: transactionId, output_index: 0 }],
+        [{tx: initialTransactions, output_index: 0}],
 
         // The (output) condition to be fullfilled in the next transaction.
         [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(productCommonsIdentity.publicKey))],
@@ -78,7 +80,7 @@ function giveProduct(keySeed, transactionId) {
     const signedTransaction = driver.Transaction.signTransaction(transferTransaction, currentIdentity.privateKey);
 
     // Post the transaction.
-    this.connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
+    connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
       // Return the posted transaction to the callback funcion.
       resolve(successfullyPostedTransaction);
     }).catch((error) => {
@@ -91,18 +93,20 @@ function giveProduct(keySeed, transactionId) {
 function takeProduct(keySeed, transactionId) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
   const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     // Construct metadata.
     const metaData = {
       action: 'Take from Commons',
       date: new Date().toISOString(),
     };
 
+    const initialTransactions = await connection.getTransaction(transactionId);
+    console.log('tester-->', initialTransactions);
+
     // Construct the new transaction
     const transferTransaction = driver.Transaction.makeTransferTransaction(
-
         // The previous transaction to be chained upon.
-        [{ tx: transactionId, output_index: 0 }],
+        [{tx: initialTransactions, output_index: 0}],
 
         // The (output) condition to be fullfilled in the next transaction.
         [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(currentIdentity.publicKey))],
@@ -115,7 +119,7 @@ function takeProduct(keySeed, transactionId) {
     const signedTransaction = driver.Transaction.signTransaction(transferTransaction, productCommonsIdentity.privateKey);
 
     // Post the transaction.
-    this.connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
+    connection.postTransactionCommit(signedTransaction).then((successfullyPostedTransaction) => {
       // Return the posted transaction to the callback funcion.
       resolve(successfullyPostedTransaction);
     }).catch((error) => {
