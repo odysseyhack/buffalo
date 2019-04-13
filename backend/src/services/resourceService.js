@@ -129,4 +129,66 @@ function takeProduct(keySeed, transactionId) {
   });
 }
 
-module.exports = { registerProduct, giveProduct, takeProduct };
+async function getProductsFromCommons() {
+  const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
+  const transactionIds = await new Promise((resolve, reject) => {
+    // Get a list of ids of unspent transactions from a public key.
+    connection.listOutputs(productCommonsIdentity.publicKey, false).then((response) => {
+      resolve(response);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+
+  let assets = [];
+
+  for (const transaction of transactionIds) {
+    await connection.getTransaction(transaction.transaction_id).then(async (response) => {
+      if (response.operation === 'CREATE') {
+        const assetTransactions = await connection.listTransactions(response.id, 'CREATE');
+        return { id: assetTransactions[0].id, data: assetTransactions[0].asset.data };
+      }
+      const assetTransactions = await connection.listTransactions(response.asset.id, 'CREATE');
+      return { id: assetTransactions[0].id, data: assetTransactions[0].asset.data };
+    }).then((response) => {
+      assets.push(response);
+    }).catch((err) => {
+      console.log(transaction.transaction_id);
+    });
+  }
+  return assets;
+
+}
+
+async function getProductsFromCustomer(keySeed) {
+  const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
+  const transactionIds = await new Promise((resolve, reject) => {
+    // Get a list of ids of unspent transactions from a public key.
+    connection.listOutputs(currentIdentity.publicKey, false).then((response) => {
+      resolve(response);
+    }).catch((err) => {
+      reject(err);
+    });
+  });
+
+  let assets = [];
+
+  for (const transaction of transactionIds) {
+    await connection.getTransaction(transaction.transaction_id).then(async (response) => {
+      if (response.operation === 'CREATE') {
+        const assetTransactions = await connection.listTransactions(response.id, 'CREATE');
+        return { id: assetTransactions[0].id, data: assetTransactions[0].asset.data };
+      }
+      const assetTransactions = await connection.listTransactions(response.asset.id, 'CREATE');
+      return { id: assetTransactions[0].id, data: assetTransactions[0].asset.data };
+    }).then((response) => {
+      assets.push(response);
+    }).catch((err) => {
+      console.log(transaction.transaction_id);
+    });
+  }
+  return assets;
+
+}
+
+module.exports = { registerProduct, giveProduct, takeProduct, getProductsFromCommons, getProductsFromCustomer };

@@ -28,4 +28,13 @@ module.exports = [{
       return asset.id
     }
   },
+    {
+        method: 'GET',
+        path: '/api/products',
+        config: { auth: false, cors: true },
+        async handler(req, h) {
+            const assets = await resourceService.getProductsFromCommons();
+            return assets;
+        }
+    },
   ];
