@@ -6,7 +6,9 @@
   "scripts": {
     "test": "mocha test/*.js",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "lint": "eslint . --ignore-pattern node_modules/",
+    "lintfix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,11 @@
     "base-x": "3.0.4"
   },
   "devDependencies": {
-    "nodemon": "^1.18.11"
+    "nodemon": "^1.18.11",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-classes": "^0.1.1",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-promise": "^4.1.1"
   }
 }
