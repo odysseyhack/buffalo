@@ -1,6 +1,6 @@
 const driver = require('bigchaindb-driver');
 const bip39 = require('bip39');
-const config = require('./config/config');
+const config = require('../config/config')
 const keyGenerationUtils = require('../utils/keyGenerationUtils');
 
 const BIGCHAINDB_URL = process.env.BIGCHAINDB_URL || config.bigchaindburl;
@@ -124,3 +124,5 @@ function takeProduct(keySeed, transactionId, productCommonsKeySeed) {
     });
   });
 }
+
+module.exports = { registerProduct, giveProduct, takeProduct }
