@@ -1,6 +1,5 @@
 const driver = require('bigchaindb-driver');
-const bip39 = require('bip39');
-const config = require('../config/config')
+const config = require('../config/config');
 const keyGenerationUtils = require('../utils/keyGenerationUtils');
 
 const BIGCHAINDB_URL = process.env.BIGCHAINDB_URL || config.bigchaindburl;
@@ -52,8 +51,9 @@ function registerProduct(keySeed, product) {
   });
 }
 
-function giveProduct(keySeed, transactionId, receiverPublicKey) {
+function giveProduct(keySeed, transactionId) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
+  const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
   return new Promise((resolve, reject) => {
     // Construct metadata.
     const metaData = {
@@ -68,7 +68,7 @@ function giveProduct(keySeed, transactionId, receiverPublicKey) {
         [{ tx: transactionId, output_index: 0 }],
 
         // The (output) condition to be fullfilled in the next transaction.
-        [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(receiverPublicKey))],
+        [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(productCommonsIdentity.publicKey))],
 
         // Metadata
         metaData,
@@ -88,9 +88,9 @@ function giveProduct(keySeed, transactionId, receiverPublicKey) {
   });
 }
 
-function takeProduct(keySeed, transactionId, productCommonsKeySeed) {
+function takeProduct(keySeed, transactionId) {
   const currentIdentity = keyGenerationUtils.generateKeypair(keySeed);
-  const productCommonsIdentity = keyGenerationUtils.generateKeypair(productCommonsKeySeed);
+  const productCommonsIdentity = keyGenerationUtils.generateKeypair('productCommonsKeySeed');
   return new Promise((resolve, reject) => {
     // Construct metadata.
     const metaData = {
@@ -125,4 +125,4 @@ function takeProduct(keySeed, transactionId, productCommonsKeySeed) {
   });
 }
 
-module.exports = { registerProduct, giveProduct, takeProduct }
+module.exports = { registerProduct, giveProduct, takeProduct };
