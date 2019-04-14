@@ -1,56 +1,44 @@
 {
   "name": "buffalo-prototype-frontend",
   "version": "1.0.0",
-  "description": "User Interface to connect to the Buffalo Network APIs",
+  "description": "PoC Module to track product from start and follow the circular flow.",
+  "main": "src/resourceTracker.js",
   "scripts": {
-    "build": "webpack -d",
-    "build:watch": "webpack --watch",
-    "lint": "eslint .; exit 0",
-    "lint:fix": "eslint . --fix",
-    "serve": "webpack -d && live-server ./Client/public",
-    "serve:dev": "webpack-dev-server --open",
-    "test": "echo \"No tests available\" && exit 1"
+    "test": "mocha --recursive *.test.*.js",
+    "lint": "eslint . --ignore-pattern node_modules/",
+    "lintfix": "eslint . --fix",
+    "bundle": "browserify src/resourceTracker.js -t localenvify -s resource_module -o src/bundle.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/odysseyhack/buffalo.git"
+  },
+  "keywords": [
+    "circular",
+    "economy",
+    "green",
+    "nature2.0",
+    "utopia"
+  ],
+  "author": "Buffalo-Network",
   "license": "MIT",
-  "babel": {
-    "presets": [
-      "env",
-      "react"
-    ]
+  "bugs": {
+    "url": "https://github.com/odysseyhack/buffalo/issues"
+  },
+  "homepage": "https://github.com/odysseyhack/buffalo#readme",
+  "dependencies": {
+    "bigchaindb-driver": "^4.1.0",
+    "bip39": "^3.0.0",
+    "dotenv": "^7.0.0",
+    "hapi": "^18.1.0",
+    "base-x": "3.0.4",
+    "localenvify": "^1.0.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.3",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-react": "^6.24.1",
-    "clean-webpack-plugin": "^0.1.17",
-    "css-loader": "^0.28.7",
-    "eslint": "^4.12.1",
-    "eslint-loader": "^1.9.0",
-    "eslint-plugin-react": "^7.5.1",
-    "html-webpack-plugin": "^2.30.1",
-    "live-server": "^1.2.0",
-    "node-sass": "^4.7.2",
-    "sass-loader": "^6.0.6",
-    "style-loader": "^0.19.0",
-    "url-loader": "^0.6.2",
-    "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.9.5"
-  },
-  "dependencies": {
-    "axios": "^0.17.1",
-    "body-parser": "^1.18.2",
-    "cors": "^2.8.4",
-    "express": "^4.16.2",
-    "moment": "^2.19.3",
-    "mongodb": "^2.2.33",
-    "morgan": "^1.9.0",
-    "react": "^16.2.0",
-    "react-burger-menu": "^2.6.8",
-    "react-dom": "^16.2.0",
-    "react-modal": "^3.1.7",
-    "uuid": "^3.1.0"
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-classes": "^0.1.1",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-promise": "^4.1.1"
   }
 }
