@@ -1,5 +1,5 @@
 const resourceService = require('../services/resourceService');
-const ketGeneration = require('../utils/keyGenerationUtils');
+const keyGeneration = require('../utils/keyGenerationUtils');
 
 module.exports = [
 
@@ -40,7 +40,7 @@ module.exports = [
   },
   {
     // Input seed of owner and transactionID
-    // Output product is now pending
+    // Output product is now unavailabe and ownership is changed
     method: 'POST',
     path: '/api/product/confirm',
     config: { auth: false, cors: true },
@@ -90,7 +90,7 @@ module.exports = [
     path: '/api/user/{seed}',
     config: { auth: false, cors: true },
     async handler(req, h) {
-      const assets = await ketGeneration.generateKeypair(req.params.seed);
+      const assets = await keyGeneration.generateKeypair(req.params.seed);
       return assets;
     },
   },
